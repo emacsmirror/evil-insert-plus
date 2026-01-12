@@ -57,10 +57,13 @@
 		(goto-char beg)
 		(move-to-column (- right-col 1))
 		(evil-append count vcount)))
+	 ((eq type 'exclusive)
+	  ;; Subtract 2: 1 for exclusive and 1 for append's natural one-char movement
+	  (goto-char (if (eolp) end (- end 2)))
+	  (evil-append count vcount))
 	 (t
-	  (goto-char (if (eolp)
-					 end
-				   (- end 1)))
+	  ;; Subtract 1 because append moves the cursor by one char naturally.
+	  (goto-char (if (eolp) end (- end 1)))
 	  (evil-append count vcount)))))
 
 (provide 'evil-insert-plus)
