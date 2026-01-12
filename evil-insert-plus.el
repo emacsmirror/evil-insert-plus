@@ -1,0 +1,64 @@
+;;; evil-insert-plus.el --- Use insert and append as operators -*- lexical-binding: t; -*-
+
+;; Author: Yad Tahir <yad at ieee.org>
+;; URL: https://github.com/yad-tahir/evil-insert-plus
+;; Package-Requires: ((emacs "24.4") (evil "1.14.0"))
+;; Version: 0.1
+;; Keywords: evil, vim, editing
+
+;;; Commentary:
+;; This package provides `evil-insert-plus` and `evil-append-plus`,
+;; allowing you to use insertion commands with motions and text objects.
+
+(evil-define-operator evil-insert-plus (beg end &optional type count)
+  "Perform `evil-insert' with a motion."
+  (interactive "<R><c>") ; <R> for range and type, <c> for count
+  (let ((vcount (and (evil-visual-state-p)
+					 (memq (evil-visual-type) '(line block))
+					 (save-excursion
+					   (let ((m (mark)))
+						 ;; Go to upper-left corner temporarily so
+						 ;; `count-lines' yields accurate results
+						 (evil-visual-rotate 'upper-left)
+						 (prog1 (count-lines evil-visual-beginning evil-visual-end)
+						   (set-mark m)))))))
+	(ignore end)
+	(cond
+	 ((eq type 'line)
+	  (evil-insert-line count vcount))
+	 (t
+	  (goto-char beg)
+	  (evil-insert count vcount)))))
+
+(evil-define-operator evil-append-plus (beg end &optional type count)
+  "Perform `evil-append' with a motion."
+  (interactive "<R><c>") ; <R> for range and type, <c> for count
+  (let ((vcount (and (evil-visual-state-p)
+					 (memq (evil-visual-type) '(line block))
+					 (save-excursion
+					   (let ((m (mark)))
+						 ;; Go to upper-left corner temporarily so
+						 ;; `count-lines' yields accurate results
+						 (evil-visual-rotate 'upper-left)
+						 (prog1 (count-lines evil-visual-beginning evil-visual-end)
+						   (set-mark m)))))))
+	(cond
+	 ((eq type 'line)
+	  (evil-append-line count vcount))
+	 ((eq type 'block)
+	  (let* ((range (evil-visual-range))
+			 (beg-col (evil-column (car range)))
+			 (end-col (evil-column (cadr range)))
+			 (left-col (min beg-col end-col))
+			 (right-col (max beg-col end-col)))
+		(ignore left-col) ;; Silent the compiler!
+		(goto-char beg)
+		(move-to-column (- right-col 1))
+		(evil-append count vcount)))
+	 (t
+	  (goto-char (if (eolp)
+					 end
+				   (- end 1)))
+	  (evil-append count vcount)))))
+
+(provide 'evil-insert-plus)
