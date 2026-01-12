@@ -53,7 +53,6 @@
 	  (let* ((range (evil-visual-range))
 			 (beg-col (evil-column (car range)))
 			 (end-col (evil-column (cadr range)))
-			 (_left-col (min beg-col end-col))
 			 (right-col (max beg-col end-col)))
 		(goto-char beg)
 		(move-to-column (- right-col 1))
