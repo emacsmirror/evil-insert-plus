@@ -17,6 +17,11 @@
 (defun evil--insert-plus-target (beg end &optional type is-append)
   "Return the point where insertion should occur for BEG, END, and TYPE.
 IS-APPEND determines if the operation is an append or insert."
+
+  ;; To determine the exact target position, we perform a dry-run "delete"
+  ;; operation. By calculating the resulting buffer displacement, we ensure the
+  ;; append logic maintains parity with change operation and handles numerous
+  ;; edge cases correctly.
   (let ((p-before (point))
 		(inhibit-modification-hooks t)
 		;; Suppress macro and undos
@@ -34,7 +39,6 @@ IS-APPEND determines if the operation is an append or insert."
 							   (if is-append (+ beg displacement) beg)
 							 ;; Backward motion
 							 (if is-append end (point)))))
-			  ;; Force a rollback of the deletion
 			  (throw 'evil-insert-plus-quit result))))))))
 
 (defun evil--insert-plus-vcount ()
