@@ -88,6 +88,11 @@ IS-APPEND determines if the operation is an append or insert."
 	  (goto-char (evil--insert-plus-target beg end type t))
 	  (evil-insert 1)))))
 
+;; VIM Quirk: Make them behave similar to evil-change specially for
+;; `evil-forward-word-begin' & `evil-forward-WORD-begin' motions
+(add-to-list 'evil-change-commands #'evil-insert-plus)
+(add-to-list 'evil-change-commands #'evil-append-plus)
+
 (provide 'evil-insert-plus)
 
 ;;; evil-insert-plus.el ends here
