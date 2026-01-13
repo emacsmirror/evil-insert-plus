@@ -3,7 +3,7 @@
 [![License: GPL v2](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 [![Evil](https://img.shields.io/badge/editor-emacs-7F5AB6.svg?logo=gnu-emacs&logoColor=white)](https://www.gnu.org/software/emacs/)
 
-**evil-insert-plus** transforms the standard `evil-mode` insertion commands into **operators**. 
+**evil-insert-plus** transforms the standard `evil-mode` insertion commands into **operators**.
 
 In standard Vim/Evil, `i` and `a` are simple commands that act on the current cursor position. This package redefines them as evil operators, allowing you to combine them with the full power of Evil **motions** and **text objects**.
 
@@ -26,11 +26,11 @@ If you have cloned the repo locally to `~/.emacs.d/lisp/evil-insert-plus`:
 (use-package evil-insert-plus
   :load-path "~/.emacs.d/lisp/evil-insert-plus"
   :bind (:map evil-normal-state-map
-         ("I" . evil-insert-plus)
-         ("A" . evil-append-plus)
-         :map evil-visual-state-map
-         ("I" . evil-insert-plus)
-         ("A" . evil-append-plus)))
+		 ("I" . evil-insert-plus)
+		 ("A" . evil-append-plus)
+		 :map evil-visual-state-map
+		 ("I" . evil-insert-plus)
+		 ("A" . evil-append-plus)))
 ```
 
 ### Manual Installation
@@ -70,7 +70,7 @@ Because `I` and `A` are now operators, applying them to the current line (the de
 
 ### Visual Block & Line Modes
 
-This package is particularly powerful in **Visual Block mode** (`Ctrl-v`). 
+This package is particularly powerful in **Visual Block mode** (`Ctrl-v`).
 
 When you have a block selected:
 1. Press `I` or `A`.

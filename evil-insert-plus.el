@@ -14,19 +14,45 @@
 
 (require 'evil)
 
+(defun evil--insert-plus-target (beg end &optional type is-append)
+  "Return the point where insertion should occur for BEG, END, and TYPE.
+IS-APPEND determines if the operation is an append or insert."
+  (let ((p-before (point))
+		(inhibit-modification-hooks t)
+		;; Suppress macro and undos
+		(defining-kbd-macro nil)
+		(executing-kbd-macro t)
+		(buffer-undo-list nil))
+	(catch 'evil-insert-plus-quit
+	  (save-excursion
+		(atomic-change-group
+		  (let ((size-before (buffer-size)))
+			;; Perform deletion into the black hole register
+			(evil-delete beg end type ?_)
+			(let* ((displacement (- size-before (buffer-size)))
+				   (result (if (= p-before (point)) ;; Forward motion
+							   (if is-append (+ beg displacement) beg)
+							 ;; Backward motion
+							 (if is-append end (point)))))
+			  ;; Force a rollback of the deletion
+			  (throw 'evil-insert-plus-quit result))))))))
+
+(defun evil--insert-plus-vcount ()
+  "Calculate line count for visual line/block insertions."
+  (when (and (evil-visual-state-p)
+			 (memq (evil-visual-type) '(line block)))
+	(save-excursion
+	  (let ((m (mark)))
+		(evil-visual-rotate 'upper-left)
+		(prog1 (count-lines evil-visual-beginning evil-visual-end)
+		  (set-mark m))))))
+
+;;;###autoload
 (evil-define-operator evil-insert-plus (beg end &optional type count)
-  "Perform `evil-insert' with a motion."
+  "Perform `evil-insert' targeting the range defined by a motion."
+  :move-point nil
   (interactive "<R><c>") ; <R> for range and type, <c> for count
-  (let ((vcount (and (evil-visual-state-p)
-					 (memq (evil-visual-type) '(line block))
-					 (save-excursion
-					   (let ((m (mark)))
-						 ;; Go to upper-left corner temporarily so
-						 ;; `count-lines' yields accurate results
-						 (evil-visual-rotate 'upper-left)
-						 (prog1 (count-lines evil-visual-beginning evil-visual-end)
-						   (set-mark m)))))))
-	(ignore end)
+  (let ((vcount (evil--insert-plus-vcount)))
 	(cond
 	 ((eq type 'line)
 	  (evil-insert-line count vcount))
@@ -34,24 +60,18 @@
 	  (goto-char beg)
 	  (evil-insert count vcount))
 	 (t
-	  (goto-char beg)
-	  (evil-insert count vcount)))))
+	  (goto-char (evil--insert-plus-target beg end type nil))
+	  (evil-insert 1)))))
 
+;;;###autoload
 (evil-define-operator evil-append-plus (beg end &optional type count)
-  "Perform `evil-append' with a motion."
+  "Perform `evil-append' targeting the range defined by a motion."
+  :move-point nil
   (interactive "<R><c>") ; <R> for range and type, <c> for count
-  (let ((vcount (and (evil-visual-state-p)
-					 (memq (evil-visual-type) '(line block))
-					 (save-excursion
-					   (let ((m (mark)))
-						 ;; Go to upper-left corner temporarily so
-						 ;; `count-lines' yields accurate results
-						 (evil-visual-rotate 'upper-left)
-						 (prog1 (count-lines evil-visual-beginning evil-visual-end)
-						   (set-mark m)))))))
+  (let ((vcount (evil--insert-plus-vcount)))
 	(cond
 	 ((eq type 'line)
-	  ;; goto-line motions
+	  ;; visual-goto-line motions
 	  (unless (or (evil-visual-state-p)
 				  (eq evil-this-motion 'evil-line-or-visual-line))
 		(goto-char end))
@@ -65,17 +85,8 @@
 		(move-to-column (1- right-col))
 		(evil-append count vcount)))
 	 (t
-	  ;; To determine the exact target position, we perform a dry-run "delete" operation.
-	  ;; By calculating the resulting buffer displacement, we ensure the append logic
-	  ;; maintains parity with the update operation and handles edge cases correctly.
-	  ;; - e.g. `evil-goto-forward' and `evil-goto-mark'
-	  (goto-char (catch 'evil-plus-after-mod
-				   (atomic-change-group
-					 (evil-delete beg end type ?_)
-					 (let ((end (if (< end (point)) end
-								  (+ (point) (- end (point))))))
-					   (throw 'evil-plus-after-mod end)))))
-	  (evil-insert count vcount)))))
+	  (goto-char (evil--insert-plus-target beg end type t))
+	  (evil-insert 1)))))
 
 (provide 'evil-insert-plus)
 
