@@ -61,14 +61,17 @@
 		(goto-char beg)
 		(move-to-column (1- right-col))
 		(evil-append count vcount)))
-	 ((eq type 'exclusive)
-	  (unless (memq evil-this-motion '(evil-forward-char
-									   evil-forward-chars))
-		(setq end (if (eolp) end (1- end))))
-	  (goto-char end)
-	  (evil-insert count vcount))
 	 (t
-	  (goto-char end)
+	  ;; To determine the exact target position, we perform a dry-run "delete" operation.
+	  ;; By calculating the resulting buffer displacement, we ensure the append logic
+	  ;; maintains parity with the update operation and handles edge cases correctly.
+	  ;; - e.g. `evil-goto-forward' and `evil-goto-mark'
+	  (goto-char (catch 'evil-plus-after-mod
+				   (atomic-change-group
+					 (evil-delete beg end type ?_)
+					 (let ((end (if (< end (point)) end
+								  (+ (point) (- end (point))))))
+					   (throw 'evil-plus-after-mod end)))))
 	  (evil-insert count vcount)))))
 
 (provide 'evil-insert-plus)
