@@ -69,8 +69,8 @@ Because `I` and `A` are now operators, applying them to the current line (the de
 | `I i (` | Jump to the inner start of the **parentheses** and insert. |
 | `I i p` | Jump to the **start of the paragraph** and insert. |
 | `A G` | Jump to the **end of of the buffer** and insert. |
-| `A g n` | Insert to the *end of the next evil-ex match**. |
-| `I g p` | Insert to the *start of the previous evil-ex match**. |
+| `A g n` | Insert to the **end of the next evil-ex match**. |
+| `I g p` | Insert to the **start of the previous evil-ex match**. |
 
 ### Visual Block & Line Modes
 
