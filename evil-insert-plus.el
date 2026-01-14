@@ -4,7 +4,7 @@
 ;; URL: https://github.com/yad-tahir/evil-insert-plus
 ;; Package-Requires: ((emacs "24.4") (evil "1.14.0"))
 ;; Version: 0.5.1
-;; Keywords: evil, vim, editing
+;; Keywords: emulations, textvim, editing
 
 ;;; Commentary:
 ;; This package allows you to use insertion commands with motions and text
@@ -14,7 +14,7 @@
 
 (require 'evil)
 
-(defun evil--insert-plus-target (beg end &optional type is-append)
+(defun evil-insert-plus--target (beg end &optional type is-append)
   "Return the point where insertion should occur for BEG, END, and TYPE.
 IS-APPEND determines if the operation is an append or insert."
 
@@ -41,7 +41,7 @@ IS-APPEND determines if the operation is an append or insert."
 							 (if is-append end (point)))))
 			  (throw 'evil-insert-plus-quit result))))))))
 
-(defun evil--insert-plus-vcount ()
+(defun evil-insert-plus--vcount ()
   "Calculate line count for visual line/block insertions."
   (when (and (evil-visual-state-p)
 			 (memq (evil-visual-type) '(line block)))
@@ -56,7 +56,7 @@ IS-APPEND determines if the operation is an append or insert."
   "Perform `evil-insert' targeting the range defined by a motion."
   :move-point nil
   (interactive "<R><c>") ; <R> for range and type, <c> for count
-  (let ((vcount (evil--insert-plus-vcount)))
+  (let ((vcount (evil-insert-plus--vcount)))
 	(cond
 	 ((eq type 'line)
 	  ;; visual-goto-line motions - e.g. `evil-goto-first-line'
@@ -68,7 +68,7 @@ IS-APPEND determines if the operation is an append or insert."
 	  (goto-char beg)
 	  (evil-insert count vcount))
 	 (t
-	  (goto-char (evil--insert-plus-target beg end type nil))
+	  (goto-char (evil-insert-plus--target beg end type nil))
 	  (evil-insert 1)))))
 
 ;;;###autoload
@@ -76,7 +76,7 @@ IS-APPEND determines if the operation is an append or insert."
   "Perform `evil-append' targeting the range defined by a motion."
   :move-point nil
   (interactive "<R><c>") ; <R> for range and type, <c> for count
-  (let ((vcount (evil--insert-plus-vcount)))
+  (let ((vcount (evil-insert-plus--vcount)))
 	(cond
 	 ((eq type 'line)
 	  ;; visual-goto-line motions - e.g. `evil-goto-line'
@@ -93,7 +93,7 @@ IS-APPEND determines if the operation is an append or insert."
 		(move-to-column (1- right-col))
 		(evil-append count vcount)))
 	 (t
-	  (goto-char (evil--insert-plus-target beg end type t))
+	  (goto-char (evil-insert-plus--target beg end type t))
 	  (evil-insert 1)))))
 
 ;; VIM Quirk: Make them behave similar to evil-change specially for
