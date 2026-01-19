@@ -24,8 +24,8 @@
 ;;; Commentary:
 ;; This package allows you to use insertion commands with motions and text
 ;; objects.
-
-;;; Features
+;;
+;; Features
 ;; - Grammatical Insertion: Use patterns like [prefix] i [motion] (e.g., "Insert
 ;; at start of paragraph").
 ;; - Visual Block Support: Intelligent line-counting ensures multi-line
