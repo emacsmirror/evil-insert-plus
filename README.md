@@ -1,6 +1,6 @@
 # 🖋️ evil-insert-plus
 
-[![Evil](https://img.shields.io/badge/editor-emacs-7F5AB6.svg?logo=gnu-emacs&logoColor=white)](https://www.gnu.org/software/emacs/) [![MELPA](https://melpa.org/packages/evil-insert-plus-badge.svg)](https://melpa.org/#/evil-insert-plus)
+[![Emacs](https://img.shields.io/badge/editor-emacs-7F5AB6.svg?logo=gnu-emacs&logoColor=white)](https://www.gnu.org/software/emacs/) [![MELPA](https://melpa.org/packages/evil-insert-plus-badge.svg)](https://melpa.org/#/evil-insert-plus)
 
 **evil-insert-plus** transforms the standard `evil-mode` insertion commands into **operators**.
 
